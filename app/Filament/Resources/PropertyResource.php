@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PropertyResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PropertyResource\RelationManagers;
+use App\Filament\Resources\PropertyResource\RelationManagers\UnitsRelationManager;
 
 class PropertyResource extends Resource
 {
@@ -29,11 +30,11 @@ class PropertyResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('property_name')->required(),
+                TextInput::make('property_name')->rules('min:3')->required(),
                 TextInput::make('street')->required(),
                 TextInput::make('residential_area'),
                 TextInput::make('city')->required(),
-                TextInput::make('postal_code')->required(),
+                TextInput::make('postal_code')->numeric()->rules(['digits:5'])->required(),
                 Select::make('state')
                         ->options([
                             'Johor' => 'Johor',
@@ -54,14 +55,15 @@ class PropertyResource extends Resource
                             'Putrajaya' => 'Putrajaya (Federal Territory)',
                         ])
                         ->label('State')
+                        ->required()
                         ->searchable() // Makes the dropdown searchable
                         ->native(false), // Ensures it renders as a custom dropdown
-                Textarea::make('description')->required(),
-                Select::make('tenure')->options(['Freehold' => 'Freehold', 'Leasehold' => 'Leasehold'] ),
+                Select::make('tenure')->options(['Freehold' => 'Freehold', 'Leasehold' => 'Leasehold'] )->required(),
                 Select::make('property_type')->options(['Condominium' => 'Condominium', 'Landed' => 'Landed'] ),
-                TextInput::make('build_year')->required()->numeric(),
+                TextInput::make('build_year')->numeric(),
                 TextInput::make('developer_name'),
-                FileUpload::make('image_url')->image()
+                Textarea::make('description')->columnSpanFull(),
+                FileUpload::make('image_url')->image()->columnSpanFull()
             ]);
     }
 
@@ -70,22 +72,24 @@ class PropertyResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id'),
-                TextColumn::make('property_name'),
-                TextColumn::make('street'),
-                TextColumn::make('city'),
-                TextColumn::make('postal_code'),
-                TextColumn::make('state'),
-                TextColumn::make('tenure'),
-                TextColumn::make('property_type'),
-                TextColumn::make('build_year'),
-                TextColumn::make('developer_name'),
-                ImageColumn::make('image_url')
+                TextColumn::make('property_name')->sortable()->searchable(),
+                TextColumn::make('street')->sortable(),
+                TextColumn::make('city')->sortable(),
+                TextColumn::make('postal_code')->sortable(),
+                TextColumn::make('state')->sortable(),
+                TextColumn::make('tenure')->sortable(),
+                TextColumn::make('property_type')->sortable(),
+                TextColumn::make('build_year')->sortable(),
+                TextColumn::make('developer_name')->sortable(),
+                ImageColumn::make('image_url')->sortable()->label('Image'),
+                TextColumn::make('created_at')->date()
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -97,7 +101,7 @@ class PropertyResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            UnitsRelationManager::class,
         ];
     }
 

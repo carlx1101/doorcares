@@ -13,28 +13,27 @@ return new class extends Migration
     {
         Schema::create('units', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('property_id');
-            $table->string('tenure');
-            $table->string('block');
-            $table->string('level');
-            $table->string('unit');
-            $table->string('layout_type');
+            $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
+            $table->string('tenure')->nullable();
+            $table->string('block')->nullable();
+            $table->string('level')->nullable();
+            $table->string('unit')->nullable();
+            $table->string('layout_type')->nullable();
             $table->integer('bedrooms');
             $table->integer('bathrooms');
             $table->integer('car_parks');
-            $table->string('balcony');
-            $table->string('cooker_type');
-            $table->string('bathtub');
+            $table->string('balcony')->nullable();
+            $table->string('cooker_type')->nullable();
+            $table->string('bathtub')->nullable();
             $table->integer('built_up_area');
             $table->integer('land_area');
             $table->string('type');
             $table->decimal('price', 10, 2);
-            $table->string('furnishing_status');
-            $table->string('description');
+            $table->string('furnishing_status')->nullable();
+            $table->string('description')->nullable();
             $table->string('image_url')->nullable();
             $table->timestamps();
-
-            $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
+    
         });
     }
 

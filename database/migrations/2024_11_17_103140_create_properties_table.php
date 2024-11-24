@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
             $table->string('property_name');
-            $table->string('street');
+            $table->string('street')->nullable();
             $table->string('residential_area')->nullable();
-            $table->string('city');
-            $table->string('postal_code');
-            $table->string('state');
+            $table->string('city')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('state')->nullable();
             $table->text('description')->nullable();
-            $table->string('tenure');
-            $table->string('property_type');
-            $table->integer('build_year');
-            $table->string('developer_name');
+            $table->string('tenure')->nullable();
+            $table->string('property_type')->nullable();
+            $table->integer('build_year')->nullable();
+            $table->string('developer_name')->nullable();
             $table->string('image_url')->nullable();
             $table->timestamps();
         });

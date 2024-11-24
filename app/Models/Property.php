@@ -28,4 +28,9 @@ class Property extends Model
     {
         return $this->belongsTo(Property::class);
     }
+
+    public function units()
+    {
+        return $this->hasMany(Unit::class);
+    }
 }

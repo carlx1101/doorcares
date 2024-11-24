@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -18,7 +19,8 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UnitResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UnitResource\RelationManagers;
-use Filament\Forms\Components\Section;
+use App\Filament\Resources\UnitResource\RelationManagers\SpaceRelationManager;
+use Filament\Tables\Filters\SelectFilter;
 
 class UnitResource extends Resource
 {
@@ -32,7 +34,7 @@ class UnitResource extends Resource
             ->schema([
                 Section::make('Property Details')->schema([
                     Select::make('property_id')->label('Property')->required()
-                    ->options(Property::all()->pluck('property_name','id')),
+                    ->relationship('property','property_name')->searchable(),
                     Select::make('tenure')->options(['Freehold' => 'Freehold', 'Leasehold' => 'Leasehold'] ),
                     TextInput::make('block')->required(),
                     TextInput::make('level')->required(),
@@ -58,12 +60,14 @@ class UnitResource extends Resource
                             ->selectablePlaceholder(false),
                     TextInput::make('built_up_area')->required()->numeric(),
                     TextInput::make('land_area')->required()->numeric(),
-                    Select::make('type')->options(['Rental' => 'Rental', 'For_Sale' => 'For_Sale']),
+                    Select::make('type')
+                            ->options(['Rental' => 'Rental', 'For_Sale' => 'For_Sale'])->required(),
                     TextInput::make('price')->required()->numeric()->rules('regex:/^\d{1,10}(\.\d{1,2})?$/'), 
                     Select::make('furnishing_status')->required()
                             ->options(['Fully Furnished' => 'Fully Furnished', 'Partially Furnished' => 'Partially Furnished', 'Unfurnished' => 'Unfurnished'] )
+                            ->default("Fully Furnished")
                             ->selectablePlaceholder(false),
-                    Textarea::make('description')->columnSpanFull(),
+                    Textarea::make('description')->columnSpanFull()->required(),
                     FileUpload::make('image_url')->image()->columnSpanFull()
                 ])->columns(3)
             ]);
@@ -74,31 +78,36 @@ class UnitResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id'),
-                TextColumn::make('property.property_name'),
-                TextColumn::make('tenure'),
-                TextColumn::make('block'),
-                TextColumn::make('level'),
-                TextColumn::make('unit'),
-                TextColumn::make('layout_type'),
-                TextColumn::make('bedrooms'),
-                TextColumn::make('bathrooms'),
-                TextColumn::make('car_parks'),
-                TextColumn::make('balcony'),
-                TextColumn::make('cooker_type'),
-                TextColumn::make('bathtub'),
-                TextColumn::make('built_up_area'),
-                TextColumn::make('land_area'),
-                TextColumn::make('type'),
-                TextColumn::make('price'),
-                TextColumn::make('furnishing_status'),
+                TextColumn::make('property.property_name')->sortable()->searchable(),
+                TextColumn::make('tenure')->sortable()->searchable(),
+                TextColumn::make('block')->sortable()->searchable(),
+                TextColumn::make('level')->sortable()->searchable(),
+                TextColumn::make('unit')->sortable()->searchable(),
+                TextColumn::make('layout_type')->sortable()->searchable(),
+                TextColumn::make('bedrooms')->sortable()->searchable(),
+                TextColumn::make('bathrooms')->sortable()->searchable(),
+                TextColumn::make('car_parks')->sortable()->searchable(),
+                TextColumn::make('balcony')->sortable()->searchable(),
+                TextColumn::make('cooker_type')->sortable()->searchable(),
+                TextColumn::make('bathtub')->sortable()->searchable(),
+                TextColumn::make('built_up_area')->sortable()->searchable(),
+                TextColumn::make('land_area')->sortable()->searchable(),
+                TextColumn::make('type')->sortable()->searchable(),
+                TextColumn::make('price')->sortable()->searchable(),
+                TextColumn::make('furnishing_status')->sortable()->searchable(),
                 TextColumn::make('description'),
                 
             ])
             ->filters([
-                //
+                SelectFilter::make('property_id')
+                    ->label('Property')
+                    ->relationship('property','property_name')
+                    ->preload()
+                    ->multiple(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -110,7 +119,7 @@ class UnitResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+             SpaceRelationManager::class,
         ];
     }
 

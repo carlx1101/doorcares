@@ -30,9 +30,23 @@ class Unit extends Model
         'description'
     ];
 
-    // Relationship with Property
     public function property()
     {
         return $this->belongsTo(Property::class);
+    }
+
+    public function spaces()
+    {
+        return $this->hasMany(Space::class);
+    }
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    public function getTitleAttribute(): string
+    {
+        return "Block {$this->block} - Level {$this->level}, Unit {$this->unit}";
     }
 }
