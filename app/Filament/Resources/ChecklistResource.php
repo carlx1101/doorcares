@@ -87,7 +87,8 @@ class ChecklistResource extends Resource
     {
         return $table
             ->columns([
-                // TextColumn::make('unit.id')->label('Unit'),
+                TextColumn::make('unit.property.property_name'),
+                TextColumn::make('unit.title')->label('Unit'),
                 TextColumn::make('tenant.full_name')->label('Tenant'),
                 TextColumn::make('created_at')->label('Created At')->dateTime(),
             ])

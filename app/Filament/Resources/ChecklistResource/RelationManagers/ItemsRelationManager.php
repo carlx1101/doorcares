@@ -20,6 +20,8 @@ class ItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'Items';
 
+    protected static ?string $recordTitleAttribute = 'space.space_name'; // Show space names in the relation manager
+
     public function form(Form $form): Form
     {
         return $form
@@ -42,9 +44,9 @@ class ItemsRelationManager extends RelationManager
                     ->nullable(),
                 Textarea::make('remark')
                     ->label('Remark')
-                    ->rows(3)
+                    // ->rows()
                     ->nullable(),
-            ]);
+            ])->columns(1);
     }
 
     public function table(Table $table): Table
